@@ -1,5 +1,5 @@
 package nixfmt
 
-func reformat() int {
-	return 1
+func reformat(in string) string {
+	return in
 }

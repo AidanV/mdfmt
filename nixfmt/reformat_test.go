@@ -7,7 +7,8 @@ import (
 )
 
 func TestFmt(t *testing.T) {
-	for i := 0; i < 1; i++ {
+	files, _ := os.ReadDir("../testdata/input")
+	for i := 0; i < len(files); i++ {
 		in, err := os.ReadFile(fmt.Sprintf("../testdata/input/%d.nix", i))
 		if err != nil {
 			panic(err)
@@ -16,7 +17,8 @@ func TestFmt(t *testing.T) {
 		if err != nil {
 			panic(err)
 		}
-		if string(in) != string(out) {
+
+		if reformat(string(in)) != string(out) {
 			t.Error()
 		}
 	}
