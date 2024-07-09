@@ -1,25 +1,30 @@
 package nixfmt
 
 import (
-	"fmt"
 	"os"
 	"testing"
 )
 
-func TestFmt(t *testing.T) {
-	files, _ := os.ReadDir("../testdata/input")
-	for i := 0; i < len(files); i++ {
-		in, err := os.ReadFile(fmt.Sprintf("../testdata/input/%d.nix", i))
-		if err != nil {
-			panic(err)
-		}
-		out, err := os.ReadFile(fmt.Sprintf("../testdata/output/%d.nix", i))
-		if err != nil {
-			panic(err)
-		}
+func RunTest(testName string) bool {
+	in, err := os.ReadFile("../testdata/input/" + testName + ".nix")
+	if err != nil {
+		panic(err)
+	}
+	out, err := os.ReadFile("../testdata/output/" + testName + ".nix")
+	if err != nil {
+		panic(err)
+	}
+	return reformat(string(in)) == string(out)
+}
 
-		if reformat(string(in)) != string(out) {
-			t.Error()
-		}
+func TestEmptyFunction(t *testing.T) {
+	if !RunTest("EmptyFunction") { // Name of nix file
+		t.Error()
+	}
+}
+
+func TestSimpleRearrange(t *testing.T) {
+	if !RunTest("SimpleRearrange") {
+		t.Error()
 	}
 }
