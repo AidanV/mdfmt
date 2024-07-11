@@ -23,3 +23,26 @@ func TestHeaderSpacing(t *testing.T) {
 	}
 }
 
+func TestLineBreakSpacing(t *testing.T) {
+	if !RunTest("LineBreakSpacing") {
+		t.Error()
+	}
+}
+
+func TestLinkNoWhitespace(t *testing.T) {
+	if !RunTest("LinkNoWhitespace") {
+		t.Error()
+	}
+}
+
+func TestLinkParentheses(t *testing.T) {
+	if !RunTest("LinkParentheses") {
+		t.Error()
+	}
+}
+
+func TestNoTabParagraph(t *testing.T) {
+	if !RunTest("NoTabParagraph") {
+		t.Error()
+	}
+}
