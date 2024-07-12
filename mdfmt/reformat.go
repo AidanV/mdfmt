@@ -3,6 +3,7 @@ package mdfmt
 import (
 	"fmt"
 	"strings"
+	"unicode"
 )
 
 /*
@@ -25,6 +26,15 @@ func isOnlyWhitespace(in string) bool {
 	return strings.TrimSpace(in) == ""
 }
 
+func linesOfOnlyWhitespaceBecomeEmpty(lines []string) []string {
+	for i, line := range lines {
+		if isOnlyWhitespace(line) {
+			lines[i] = ""
+		}
+	}
+	return lines
+}
+
 func removeEmptyBeginningLines(lines []string) []string {
 	start := -1
 	for i, line := range lines {
@@ -43,12 +53,12 @@ func removeEmptyBeginningLines(lines []string) []string {
 
 func ensureOneEmptyEndLine(lines []string) []string {
 	end := -1
-	for i := range lines {
-		ri := len(lines) - 1 - i
-		if !isOnlyWhitespace(lines[ri]) {
-			end = ri + 1
+	for i, line := range lines {
+		if line != "" {
+			end = i + 1
 		}
 	}
+	fmt.Println(end)
 	if end == -1 {
 		return []string{}
 	} else {
@@ -56,12 +66,49 @@ func ensureOneEmptyEndLine(lines []string) []string {
 	}
 }
 
+func insert(a []int, c int, i int) []int {
+	return append(a[:i], append([]int{c}, a[i:]...)...)
+}
+
+func ensureHorizontalRuleHasEmptyLineAfter(lines []string) []string {
+	line_nums_with_horizontal_rule := []int{}
+	// a horizontal rule is 3 or more '-'  with only whitespace as other characters
+	//
+	for i, line := range lines {
+		// remove all spaces
+		dash_count := 0
+		for _, c := range line {
+			if c == '-' {
+				dash_count += 1
+			} else if !unicode.IsSpace(c) {
+				continue
+			}
+		}
+		if dash_count < 3 {
+			continue
+		}
+		// we know that this is a horizontal rule
+		line_nums_with_horizontal_rule = append(line_nums_with_horizontal_rule, i)
+	}
+	// since we called ensureOneEmptyEndLine we do not have to check for last line
+	offset := 0
+	for _, line_num := range line_nums_with_horizontal_rule {
+		if lines[line_num+offset+1] != "" {
+			lines = append(lines[:line_num+offset+1], append([]string{""}, lines[line_num+offset+1:]...)...)
+			offset += 1
+		}
+	}
+	return lines
+}
+
 func reformat(in string) string {
 	lines := strings.Split(in, "\n")
 	// remove empty lines at beginning
+	// convert all lines that are just white space to empty lines
+	lines = linesOfOnlyWhitespaceBecomeEmpty(lines)
 	lines = removeEmptyBeginningLines(lines)
 	lines = ensureOneEmptyEndLine(lines)
-
+	lines = ensureHorizontalRuleHasEmptyLineAfter(lines)
 	// ensure empty line at end
 	//for i := range lines {
 	//	if lines[i] == "" {
