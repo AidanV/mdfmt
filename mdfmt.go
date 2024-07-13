@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mdfmt/mdfmt"
 	"os"
+	"sync"
 )
 
 type PathSet map[string]struct{}
@@ -31,11 +32,21 @@ func main() {
 	for _, filePath := range os.Args[1:] {
 		paths.Add(filePath)
 	}
-	for _, path := range paths.List() {
+
+	var wg sync.WaitGroup
+
+	handleReformat := func(path string) {
+		defer wg.Done()
 		in, err := os.ReadFile(path)
 		if err != nil {
 			panic(err)
 		}
 		fmt.Println(mdfmt.Reformat(string(in)))
 	}
+
+	for _, path := range paths.List() {
+		wg.Add(1)
+		go handleReformat(path)
+	}
+	wg.Wait()
 }
