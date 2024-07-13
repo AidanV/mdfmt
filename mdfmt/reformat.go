@@ -175,6 +175,39 @@ func removeLinkParentheses(lines []string) []string {
 }
 
 func ensureHeaderHasEmptyLinesSurrounding(lines []string) []string {
+	isHeader := func(s string) bool {
+		possibleStarts := []string{"# ", "## ", "### ", "#### ", "##### ", "###### "}
+		for _, start := range possibleStarts {
+			if strings.Index(s, start) == 0 {
+				return true
+			}
+		}
+		return false
+	}
+	// find header
+	// check if line above is empty
+	// if it is not empty add line above
+	// check if line below is empty
+	// if it is not empty add line below
+	numLines := len(lines)
+	for i := 0; i < numLines; i++ {
+		if !isHeader(lines[i]) {
+			continue
+		}
+		// check above
+		if i > 0 && lines[i-1] != "" {
+			// add line above
+			lines = append(lines[:i], append([]string{""}, lines[i:]...)...)
+			numLines++
+			i++
+		}
+		if i+1 < numLines && lines[i+1] != "" {
+			// add line below
+			lines = append(lines[:i+1], append([]string{""}, lines[i+1:]...)...)
+			numLines++
+			i++
+		}
+	}
 	return lines
 }
 
@@ -184,7 +217,7 @@ func Reformat(in string) string {
 	lines = removeEmptyBeginningLines(lines)
 	lines = ensureOneEmptyEndLine(lines)
 	lines = ensureHorizontalRuleHasEmptyLineAfter(lines)
-	//lines = ensureHeaderHasEmptyLinesSurrounding(lines)
+	lines = ensureHeaderHasEmptyLinesSurrounding(lines)
 	lines = removeLinkWhitespaces(lines)
 	lines = removeLinkParentheses(lines)
 	out := strings.Join(lines, "\n")

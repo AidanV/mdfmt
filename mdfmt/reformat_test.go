@@ -15,7 +15,7 @@ func RunTest(testName string) bool {
 	if err != nil {
 		panic(err)
 	}
-	return reformat(string(in)) == string(out)
+	return Reformat(string(in)) == string(out)
 }
 
 func TestRemoveEmptyBeginningLines(t *testing.T) {
