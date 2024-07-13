@@ -1,2 +1,1 @@
-[link](https://www.example.com/test test
-test)
+[link](https://www.example.com/test test test)

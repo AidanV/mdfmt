@@ -178,7 +178,7 @@ func ensureHeaderHasEmptyLinesSurrounding(lines []string) []string {
 	return lines
 }
 
-func reformat(in string) string {
+func Reformat(in string) string {
 	lines := strings.Split(in, "\n")
 	lines = linesOfOnlyWhitespaceBecomeEmpty(lines)
 	lines = removeEmptyBeginningLines(lines)
