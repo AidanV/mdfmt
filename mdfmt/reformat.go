@@ -58,7 +58,6 @@ func ensureOneEmptyEndLine(lines []string) []string {
 			end = i + 1
 		}
 	}
-	fmt.Println(end)
 	if end == -1 {
 		return []string{}
 	} else {
@@ -71,59 +70,93 @@ func insert(a []int, c int, i int) []int {
 }
 
 func ensureHorizontalRuleHasEmptyLineAfter(lines []string) []string {
-	line_nums_with_horizontal_rule := []int{}
+	lineNumsWithHorizontalRule := []int{}
 	// a horizontal rule is 3 or more '-'  with only whitespace as other characters
 	//
 	for i, line := range lines {
 		// remove all spaces
-		dash_count := 0
+		dashCount := 0
 		for _, c := range line {
 			if c == '-' {
-				dash_count += 1
+				dashCount += 1
 			} else if !unicode.IsSpace(c) {
 				continue
 			}
 		}
-		if dash_count < 3 {
+		if dashCount < 3 {
 			continue
 		}
 		// we know that this is a horizontal rule
-		line_nums_with_horizontal_rule = append(line_nums_with_horizontal_rule, i)
+		lineNumsWithHorizontalRule = append(lineNumsWithHorizontalRule, i)
 	}
 	// since we called ensureOneEmptyEndLine we do not have to check for last line
 	offset := 0
-	for _, line_num := range line_nums_with_horizontal_rule {
-		if lines[line_num+offset+1] != "" {
-			lines = append(lines[:line_num+offset+1], append([]string{""}, lines[line_num+offset+1:]...)...)
+	for _, lineNum := range lineNumsWithHorizontalRule {
+		if lines[lineNum+offset+1] != "" {
+			lines = append(lines[:lineNum+offset+1], append([]string{""}, lines[lineNum+offset+1:]...)...)
 			offset += 1
 		}
 	}
 	return lines
 }
 
+// TODO: This needs to be fixed for multiple line links
+// TODO: make this work for lines with multiple links
+func removeLinkWhitespaces(lines []string) []string {
+	removeWhitespace := func(link string) string {
+		var builder strings.Builder
+		for _, c := range link {
+			if unicode.IsSpace(c) {
+				builder.WriteString("%20")
+			} else {
+				builder.WriteRune(c)
+			}
+		}
+		return builder.String()
+	}
+	for i, line := range lines {
+		fmt.Println("1")
+		openSquareBracketIndex := strings.Index(line, "[")
+		if openSquareBracketIndex == -1 {
+			continue
+		}
+
+		fmt.Println("2")
+		middleIndex := strings.Index(line, "](")
+		if middleIndex == -1 {
+			continue
+		}
+		left := line[:middleIndex+2]
+
+		fmt.Println("3")
+		closeParenthesesIndex := strings.Index(line, ")")
+		if closeParenthesesIndex == -1 {
+			continue
+		}
+		fmt.Println(openSquareBracketIndex, middleIndex, closeParenthesesIndex)
+		link := line[middleIndex+2 : closeParenthesesIndex]
+		fmt.Println("4")
+		right := line[closeParenthesesIndex:]
+		fmt.Println("5")
+		// save text to the right of ^
+		lines[i] = left + removeWhitespace(link) + right
+		fmt.Printf("Line %d: %s\n", i, lines[i])
+	}
+	return lines
+}
+
+func ensureHeaderHasEmptyLinesSurrounding(lines []string) []string {
+	return lines
+}
+
 func reformat(in string) string {
 	lines := strings.Split(in, "\n")
-	// remove empty lines at beginning
-	// convert all lines that are just white space to empty lines
 	lines = linesOfOnlyWhitespaceBecomeEmpty(lines)
 	lines = removeEmptyBeginningLines(lines)
 	lines = ensureOneEmptyEndLine(lines)
 	lines = ensureHorizontalRuleHasEmptyLineAfter(lines)
-	// ensure empty line at end
-	//for i := range lines {
-	//	if lines[i] == "" {
-	//		continue
-	//	}
-	//	if lines[i][0] == '#' {
-	//		if i > 0 {
-	//			if lines[i-1] != "" {
-
-	//			}
-	//		}
-
-	//	}
-	//}
+	//lines = ensureHeaderHasEmptyLinesSurrounding(lines)
+	lines = removeLinkWhitespaces(lines)
 	line := strings.Join(lines, "\n")
-	fmt.Print(line)
 	return line
 }
