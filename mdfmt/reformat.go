@@ -1,7 +1,6 @@
 package mdfmt
 
 import (
-	"fmt"
 	"strings"
 	"unicode"
 )
@@ -100,6 +99,47 @@ func ensureHorizontalRuleHasEmptyLineAfter(lines []string) []string {
 	return lines
 }
 
+func applyToLinks(lines []string, f func(string) string) []string {
+	for i, line := range lines {
+		openSquareBracketIndex := strings.Index(line, "[")
+		if openSquareBracketIndex == -1 {
+			continue
+		}
+
+		middleIndex := strings.Index(line, "](")
+		if middleIndex == -1 {
+			continue
+		}
+		left := line[:middleIndex+2]
+
+		// stack
+		closeParenthesesIndex := -1
+		parenStack := 0
+		for i := middleIndex + 2; i < len(line); i++ {
+			switch line[i] {
+			case ')':
+				{
+					if parenStack == 0 {
+						closeParenthesesIndex = i
+					} else {
+						parenStack--
+					}
+				}
+			case '(':
+				parenStack++
+			}
+		}
+		if closeParenthesesIndex == -1 {
+			continue
+		}
+		link := line[middleIndex+2 : closeParenthesesIndex]
+		right := line[closeParenthesesIndex:]
+		// save text to the right of ^
+		lines[i] = left + f(link) + right
+	}
+	return lines
+}
+
 // TODO: This needs to be fixed for multiple line links
 // TODO: make this work for lines with multiple links
 func removeLinkWhitespaces(lines []string) []string {
@@ -114,35 +154,24 @@ func removeLinkWhitespaces(lines []string) []string {
 		}
 		return builder.String()
 	}
-	for i, line := range lines {
-		fmt.Println("1")
-		openSquareBracketIndex := strings.Index(line, "[")
-		if openSquareBracketIndex == -1 {
-			continue
-		}
+	return applyToLinks(lines, removeWhitespace)
+}
 
-		fmt.Println("2")
-		middleIndex := strings.Index(line, "](")
-		if middleIndex == -1 {
-			continue
+func removeLinkParentheses(lines []string) []string {
+	removeParentheses := func(link string) string {
+		var builder strings.Builder
+		for _, c := range link {
+			if c == '(' {
+				builder.WriteString("%28")
+			} else if c == ')' {
+				builder.WriteString("%29")
+			} else {
+				builder.WriteRune(c)
+			}
 		}
-		left := line[:middleIndex+2]
-
-		fmt.Println("3")
-		closeParenthesesIndex := strings.Index(line, ")")
-		if closeParenthesesIndex == -1 {
-			continue
-		}
-		fmt.Println(openSquareBracketIndex, middleIndex, closeParenthesesIndex)
-		link := line[middleIndex+2 : closeParenthesesIndex]
-		fmt.Println("4")
-		right := line[closeParenthesesIndex:]
-		fmt.Println("5")
-		// save text to the right of ^
-		lines[i] = left + removeWhitespace(link) + right
-		fmt.Printf("Line %d: %s\n", i, lines[i])
+		return builder.String()
 	}
-	return lines
+	return applyToLinks(lines, removeParentheses)
 }
 
 func ensureHeaderHasEmptyLinesSurrounding(lines []string) []string {
@@ -157,6 +186,7 @@ func reformat(in string) string {
 	lines = ensureHorizontalRuleHasEmptyLineAfter(lines)
 	//lines = ensureHeaderHasEmptyLinesSurrounding(lines)
 	lines = removeLinkWhitespaces(lines)
-	line := strings.Join(lines, "\n")
-	return line
+	lines = removeLinkParentheses(lines)
+	out := strings.Join(lines, "\n")
+	return out
 }
