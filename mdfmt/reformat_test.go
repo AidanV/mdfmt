@@ -76,5 +76,4 @@ func TestNoTabParagraph(t *testing.T) {
 		t.Error()
 	}
 }
-
-//TODO: REMOVE TRAILING WHITESPACE
+i do realy
