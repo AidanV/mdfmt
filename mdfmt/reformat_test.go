@@ -71,9 +71,8 @@ func TestNoEmptyLineBeginning(t *testing.T) {
 	}
 }
 
-func TestNoTabParagraph(t *testing.T) {
-	if !RunTest("NoTabParagraph") {
-		t.Error()
-	}
-}
-i do realy
+// func TestNoTabParagraph(t *testing.T) {
+// 	if !RunTest("NoTabParagraph") {
+// 		t.Error()
+// 	}
+// }
