@@ -76,3 +76,9 @@ func TestNoTabParagraph(t *testing.T) {
 		t.Error()
 	}
 }
+
+func TestAll(t *testing.T) {
+	if !RunTest("All") {
+		t.Error()
+	}
+}
