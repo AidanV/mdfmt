@@ -211,6 +211,48 @@ func ensureHeaderHasEmptyLinesSurrounding(lines []string) []string {
 	return lines
 }
 
+func removeTabFromParagraph(lines []string) []string {
+	isValidStartChar := func(ch byte) bool {
+		badChars := []byte{'\t', ' ', '#'}
+		for _, c := range badChars {
+			if ch == c {
+				return false
+			}
+		}
+		return true
+	}
+
+	// non indented
+	isParagraphLine := func(s string) bool {
+		if s == "" {
+			return false
+		}
+		return isValidStartChar(s[0])
+	}
+
+	isIndentedLine := func(s string) bool {
+
+		trimmedS := strings.TrimLeft(s, "\t ")
+		return s != trimmedS && isValidStartChar(trimmedS[0])
+	}
+	// a paragraph is a block of unindented text
+	// with or without the first line indented
+	// two pointer method
+	// find line with blank line above and unindented line after
+	// unindent first line
+	emptyLineAbove := true
+	for i, line := range lines {
+		if emptyLineAbove &&
+			isIndentedLine(line) &&
+			i+1 < len(lines) &&
+			isParagraphLine(lines[i+1]) {
+			lines[i] = strings.TrimLeft(line, "\t ")
+		}
+		emptyLineAbove = line == ""
+	}
+	return lines
+}
+
 func Reformat(in string) string {
 	lines := strings.Split(in, "\n")
 	lines = linesOfOnlyWhitespaceBecomeEmpty(lines)
@@ -220,6 +262,7 @@ func Reformat(in string) string {
 	lines = ensureHeaderHasEmptyLinesSurrounding(lines)
 	lines = removeLinkWhitespaces(lines)
 	lines = removeLinkParentheses(lines)
+	lines = removeTabFromParagraph(lines)
 	out := strings.Join(lines, "\n")
 	return out
 }
