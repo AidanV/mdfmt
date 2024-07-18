@@ -8,17 +8,6 @@ import (
 /*
 https://www.markdownguide.org/basic-syntax/
 Rules to follow
-
-# (Headers) have lines of whitespace around them
-
---- (horizontal rule) have a line of whitespacer after
-
-no tabs to start paragraphs
-
-Any spaces in url should be converted to %20 [link](https://www.example.com/test page) -> [link](https://www.example.com/test%20page)
-Parentheses in a url should be replaced with () -> %28%29
-
-i plan on always having empty line at the end
 */
 
 func isOnlyWhitespace(in string) bool {
@@ -235,11 +224,6 @@ func removeTabFromParagraph(lines []string) []string {
 		trimmedS := strings.TrimLeft(s, "\t ")
 		return s != trimmedS && isValidStartChar(trimmedS[0])
 	}
-	// a paragraph is a block of unindented text
-	// with or without the first line indented
-	// two pointer method
-	// find line with blank line above and unindented line after
-	// unindent first line
 	emptyLineAbove := true
 	for i, line := range lines {
 		if emptyLineAbove &&
