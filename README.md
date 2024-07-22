@@ -6,3 +6,7 @@
 - Removes whitespaces from links
 - Unindents paragraphs
 - Moves first line of text to the beginning of a file
+
+## Usage
+
+mdfmt [filename...]
