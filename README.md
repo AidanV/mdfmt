@@ -10,3 +10,5 @@
 ## Usage
 
 mdfmt [filename...]
+
+This can take multiple files as input and format them all.
