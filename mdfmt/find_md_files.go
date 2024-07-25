@@ -1,12 +1,16 @@
 package mdfmt
 
-import "os"
-
 // take in file path return md files
 type PathSet map[string]struct{}
 
 func (p PathSet) Add(s string) {
 	p[s] = struct{}{}
+}
+
+func (p PathSet) AddList(s []string) {
+	for _, path := range s {
+		p.Add(path)
+	}
 }
 
 func (p PathSet) List() []string {
@@ -18,14 +22,13 @@ func (p PathSet) List() []string {
 }
 
 func GetAllPathsInPaths(dirs []string) []string {
-	return []string{"input/All.md"}
+	p := make(PathSet)
+	for _, dir := range dirs {
+		p.AddList(getMdFilePathsInDir(dir))
+	}
+	return p.List()
 }
 
 func getMdFilePathsInDir(dir string) []string {
-	paths := make(PathSet)
-	// create a set of all .md file paths
-	for _, filePath := range os.Args[1:] {
-		paths.Add(filePath)
-	}
-	return []string{"input/All.md"}
+	return []string{"/home/aidan/Projects/mdfmt/testdata/input/All.md"}
 }

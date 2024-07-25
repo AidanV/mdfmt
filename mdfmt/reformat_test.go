@@ -18,6 +18,10 @@ func RunTest(testName string) bool {
 	return Reformat(string(in)) == string(out)
 }
 
+func TestAllMdFilesInDir(t *testing.T) {
+
+}
+
 func TestRemoveEmptyBeginningLines(t *testing.T) {
 	lines := []string{"", "non empty"}
 	lines = removeEmptyBeginningLines(lines)
