@@ -1,5 +1,10 @@
 package mdfmt
 
+import (
+	"fmt"
+	"os"
+)
+
 // take in file path return md files
 type PathSet map[string]struct{}
 
@@ -30,5 +35,21 @@ func GetAllPathsInPaths(dirs []string) []string {
 }
 
 func getMdFilePathsInDir(dir string) []string {
-	return []string{"/home/aidan/Projects/mdfmt/testdata/input/All.md"}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return []string{}
+	}
+	ret := []string{}
+	for _, entry := range entries {
+		if entry.IsDir() {
+			ret = append(ret, getMdFilePathsInDir(dir+entry.Name())...)
+		} else {
+			if entry.Name()[len(entry.Name())-3:] == ".md" {
+				ret = append(ret, dir+entry.Name())
+			}
+		}
+	}
+	fmt.Println("we are here!!!")
+	fmt.Println(ret)
+	return ret
 }
