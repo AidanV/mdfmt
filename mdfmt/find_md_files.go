@@ -34,6 +34,16 @@ func GetAllPathsInPaths(dirs []string) []string {
 	return p.List()
 }
 
+func extendPathWithFile(dir string, entry string) string {
+	if dir == "" {
+		return entry
+	} else if dir[len(dir)-1] == '/' {
+		return dir + entry
+	} else {
+		return dir + "/" + entry
+	}
+}
+
 func getMdFilePathsInDir(dir string) []string {
 	entries, err := os.ReadDir(dir)
 	if err != nil {
@@ -42,11 +52,9 @@ func getMdFilePathsInDir(dir string) []string {
 	ret := []string{}
 	for _, entry := range entries {
 		if entry.IsDir() {
-			ret = append(ret, getMdFilePathsInDir(dir+entry.Name())...)
-		} else {
-			if entry.Name()[len(entry.Name())-3:] == ".md" {
-				ret = append(ret, dir+entry.Name())
-			}
+			ret = append(ret, getMdFilePathsInDir(extendPathWithFile(dir, entry.Name()))...)
+		} else if entry.Name()[len(entry.Name())-3:] == ".md" {
+			ret = append(ret, extendPathWithFile(dir, entry.Name()))
 		}
 	}
 	fmt.Println("we are here!!!")
