@@ -1,7 +1,6 @@
 package mdfmt
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -57,7 +56,5 @@ func getMdFilePathsInDir(dir string) []string {
 			ret = append(ret, extendPathWithFile(dir, entry.Name()))
 		}
 	}
-	fmt.Println("we are here!!!")
-	fmt.Println(ret)
 	return ret
 }
