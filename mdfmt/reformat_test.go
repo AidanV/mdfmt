@@ -3,6 +3,7 @@ package mdfmt
 import (
 	"fmt"
 	"os"
+	"slices"
 	"testing"
 )
 
@@ -84,5 +85,35 @@ func TestNoTabParagraph(t *testing.T) {
 func TestAll(t *testing.T) {
 	if !RunTest("All") {
 		t.Error()
+	}
+}
+
+func TestFindFiles(t *testing.T) {
+	paths := GetAllPathsInPaths([]string{"../testdata"})
+	targetPaths := []string{
+		"../testdata/input/EmptyLineEnd.md",
+		"../testdata/input/HeaderSpacing.md",
+		"../testdata/input/LinkNoWhitespace.md",
+		"../testdata/output/HeaderSpacing.md",
+		"../testdata/output/LinkNoWhitespace.md",
+		"../testdata/input/LineBreakSpacing.md",
+		"../testdata/output/All.md",
+		"../testdata/output/LineBreakSpacing.md",
+		"../testdata/output/NoEmptyLineBeginning.md",
+		"../testdata/output/NoTabParagraph.md",
+		"../testdata/input/All.md",
+		"../testdata/input/NoEmptyLineBeginning.md",
+		"../testdata/output/EmptyLineEnd.md",
+		"../testdata/output/LinkParentheses.md",
+		"../testdata/input/LinkParentheses.md",
+		"../testdata/input/NoTabParagraph.md",
+		"../testdata/input/subdir/subdir.md",
+	}
+	slices.Sort(paths)
+	slices.Sort(targetPaths)
+	for i, path := range targetPaths {
+		if path != paths[i] {
+			t.Error()
+		}
 	}
 }
