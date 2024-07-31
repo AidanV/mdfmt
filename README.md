@@ -12,3 +12,18 @@
 mdfmt [filename...]
 
 This can take multiple files as input and format them all.
+
+## Building
+
+If on nixos run:
+
+```Bash
+nix develop
+```
+
+Then run
+
+```Bash
+go run mdfmt
+```
+
