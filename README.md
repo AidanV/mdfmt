@@ -27,3 +27,8 @@ Then run
 go run mdfmt
 ```
 
+To run unit tests run
+```Bash
+cd mdfmt
+go test -v
+```
