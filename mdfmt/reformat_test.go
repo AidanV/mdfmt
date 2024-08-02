@@ -20,6 +20,26 @@ func RunTest(testName string) bool {
 }
 
 func TestAllMdFilesInDir(t *testing.T) {
+	inputPaths := GetAllPathsInPaths([]string{"../testdata/input"})
+	outputPaths := GetAllPathsInPaths([]string{"../testdata/output"})
+	slices.Sort(inputPaths)
+	slices.Sort(outputPaths)
+	for i, path := range inputPaths {
+		in, err := os.ReadFile(path)
+		if err != nil {
+			t.Error()
+		}
+
+		formattedIn := Reformat(string(in))
+		out, err := os.ReadFile(outputPaths[i])
+		if err != nil {
+			t.Error()
+		}
+		if string(out) != formattedIn {
+			fmt.Println("we were not equal")
+			t.Error()
+		}
+	}
 
 }
 
@@ -34,7 +54,6 @@ func TestRemoveEmptyBeginningLines(t *testing.T) {
 func TestEnsureOneEmptyEndLine(t *testing.T) {
 	lines := []string{"non empty", "", ""}
 	lines = ensureOneEmptyEndLine(lines)
-	fmt.Print(lines)
 	if len(lines) != 2 || lines[0] != "non empty" || lines[1] != "" {
 		t.Error()
 	}
